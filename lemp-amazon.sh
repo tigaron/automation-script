@@ -2,24 +2,18 @@
 
 # Install linux update
 sudo yum update -y
-
-# Install MySQL
 sudo yum install https://dev.mysql.com/get/mysql80-community-release-el7-5.noarch.rpm -y
 sudo amazon-linux-extras install epel -y
-sudo yum install mysql-community-server -y
 
-# Install NGINX
-sudo amazon-linux-extras install nginx1.12 -y
-
-# Install PHP and PHP-FPM
-sudo amazon-linux-extras install php8.1 -y
+# Install MySQL, NGINX, and PHP-FPM
+sudo yum install mysql-community-server nginx1.12 php8.1 -y
 
 # Configure NGINX
-sudo cat > /etc/nginx/conf.d/default.conf << 'EOF'
+sudo bash -c "cat > /etc/nginx/conf.d/default.conf << 'EOF'
 server {
   listen 80;
   listen [::]:80;
-  server_name _;
+  server_name fls.red;
 
   location / {
     root   /usr/share/nginx/html;
@@ -35,9 +29,11 @@ server {
   }
 }
 EOF
+"
 
-# Add a test.php to /usr/share/nginx/html
-sudo bash -c "echo '<?php phpinfo(); ?>' > /usr/share/nginx/html/test.php"
+# Add dummy files to /usr/share/nginx/html
+sudo bash -c "echo '<?php phpinfo(); ?>' > /usr/share/nginx/html/index.php"
+sudo bash -c "echo '<?php var_export(\$_SERVER)?>' > /usr/share/nginx/html/test.php"
 
 # Add MySQL, NGINX, and PHP-FPM service start to boot sequence
 sudo chkconfig mysqld on
